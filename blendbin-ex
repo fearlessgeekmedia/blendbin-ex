@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [ $# -eq 0 ] || [ $1 = -h ] || [ $1 = --help ] 
+then
+	echo -e "blendbin-ex usage: \n
+blendbin-ex is used from within a Linux container on BlendOS to export a binary easily, without knowing the path.\n \
+\n
+In the event this program fails to export your binary, it's possible it could be a built-in shell command or you mis-typed your binary filename which you wanted to export.\n
+For help with blendbin-ex \n
+blendbin-ex [-h | --help]\n
+To export a binary to the host system \n
+blendbin-ex [ binary-name ]\n \n"
+	exit 0
+fi
+
+progToExport=$(command -v $1)
+exportLocation=~/.local/bin
+distrobox-export --bin $progToExport --export-path $exportLocation
