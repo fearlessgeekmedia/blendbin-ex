@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+#A script to export binaries from containers to the host system in BlendOS or Distrobox.
 
+#Check if the proper argument was given, or if the user needed help with the command.
 if [ $# -eq 0 ] || [ $1 = -h ] || [ $1 = --help ] 
 then
 	echo -e "blendbin-ex usage: \n
@@ -13,6 +15,7 @@ blendbin-ex [ binary-name ]\n \n"
 	exit 0
 fi
 
+#The actual work of the script
 progToExport=$(command -v $1)
 exportLocation=~/.local/bin
 distrobox-export --bin $progToExport --export-path $exportLocation
