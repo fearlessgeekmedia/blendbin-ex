@@ -11,11 +11,55 @@ In the event this program fails to export your binary, it's possible it could be
 For help with blendbin-ex \n
 blendbin-ex [-h | --help]\n
 To export a binary to the host system \n
-blendbin-ex [ binary-name ]\n \n"
+blendbin-ex [ binary-name ] [ export path (optional) ]\n
+\n
+Without the export path, the default path will be $DISTROBOX_HOST_HOME/.local/bin/."
 	exit 0
 fi
 
-#The actual work of the script
+# Check we're running inside a container and not on the host.
+if [ ! -f /run/.containerenv ] && [ ! -f /.dockerenv ]; then
+  printf >&2 "You must run %s inside a container!\n" " $(basename "$0")"
+  exit 126
+fi
+
+# Check if we're in a rootful or rootless container.
+if grep -q "rootless=0" /run/.containerenv 2> /dev/null; then
+  rootful="--root"
+fi
+
+# We're working with HOME, so we must run as USER, not as root.
+if [ "$(id -u)" -eq 0 ]; then
+  printf >&2 "You must not run %s as root!\n" " $(basename "$0")"
+  exit 1
+fi
+
+# Let's get the container name
+if  [ -n "${CONTAINER_ID}" ]; then
+  container_name="${CONTAINER_ID}"
+# if the variable is not set, let's fall back to some tricks.                                  
+elif  [ -e /.dockerenv ]; then
+  # we're in docker, let's use this trick
+  container_name=$(grep "memory:/" < /proc/self/cgroup | sed 's|.*/||')
+elif [ -e /run/.containerenv ]; then
+  # we're in podman, use this other trick
+  container_name=$(grep "name=" /run/.containerenv | cut -d'=' -f2- | tr -d '"')
+fi
+# If one of the previous methods didn't work
+# let's fallback to a more simple way but error prone
+if [ -z "${container_name}" ]; then
+  container_name=$(uname -n | cut -d'.' -f1)
+fi
+
+
 progToExport=$(command -v $1)
-exportLocation=~/.local/bin
-distrobox-export --bin $progToExport --export-path $exportLocation
+if [ $# = 1 ]
+then
+	exportLocation="$DISTROBOX_HOST_HOME/.local/bin/"
+else
+	exportLocation=$2
+	echo $exportLocation
+fi
+
+exportCommand="distrobox-export --bin $progToExport --export-path $exportLocation"
+$exportCommand
