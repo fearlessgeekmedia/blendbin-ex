@@ -55,7 +55,12 @@ fi
 progToExport=$(command -v $1)
 if [ $# = 1 ]
 then
-	exportLocation="$DISTROBOX_HOST_HOME/.local/bin/"
+	if [ $DISTROBOX_HOST_HOME ]
+	then
+		exportLocation="$DISTROBOX_HOST_HOME/.local/bin/"
+	else
+		exportLocation="$HOME/.local/bin"
+	fi
 else
 	exportLocation=$2
 	echo $exportLocation
