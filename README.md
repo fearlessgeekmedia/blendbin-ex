@@ -7,7 +7,7 @@ This is meant to be used within the container itself, and not on the host system
 
 Basic usage:
 
-`blendbin-ex [ name_of_binary ] [ export path (optional)`
+`blendbin-ex [ name_of_binary ] [ export path (optional) ]`
 
 Example
 
