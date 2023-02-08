@@ -57,7 +57,7 @@ if [ $# = 1 ]
 then
 	if [ $DISTROBOX_HOST_HOME ]
 	then
-		exportLocation="$DISTROBOX_HOST_HOME/.local/bin/"
+		exportLocation="$DISTROBOX_HOST_HOME/.local/bin"
 	else
 		exportLocation="$HOME/.local/bin"
 	fi
